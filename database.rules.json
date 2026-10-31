@@ -1,0 +1,31 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "settings": {".read": true, ".write": "auth != null && auth.uid === 'REPLACE_WITH_ADMIN_UID'"},
+    "catalog":  {".read": true, ".write": "auth != null && auth.uid === 'REPLACE_WITH_ADMIN_UID'"},
+    "users": {
+      ".read": "auth != null && auth.uid === 'REPLACE_WITH_ADMIN_UID'",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && (auth.uid === 'REPLACE_WITH_ADMIN_UID' || (auth.uid === $uid && !data.exists()))",
+        ".validate": "newData.hasChildren(['name','email'])"
+      }
+    },
+    "blocked": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.uid === 'REPLACE_WITH_ADMIN_UID')",
+        ".write": "auth != null && auth.uid === 'REPLACE_WITH_ADMIN_UID'"
+      },
+      ".read": "auth != null && auth.uid === 'REPLACE_WITH_ADMIN_UID'"
+    },
+    "orders": {
+      ".read": "auth != null && auth.uid === 'REPLACE_WITH_ADMIN_UID'",
+      "$orderId": {
+        ".read": "auth != null && (data.child('u').val() === auth.uid || auth.uid === 'REPLACE_WITH_ADMIN_UID')",
+        ".write": "auth != null && (auth.uid === 'REPLACE_WITH_ADMIN_UID' || (!data.exists() && newData.child('u').val() === auth.uid && newData.child('status').val() === 'pending' && !root.child('blocked').child(auth.uid).exists()))",
+        ".validate": "newData.hasChildren(['pkg','amount','method','trx','status','at','u'])"
+      }
+    }
+  }
+}
